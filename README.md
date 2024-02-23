@@ -3,7 +3,7 @@
 
 <h3> 👨🏻‍💻 About Project </h3>
 
-- 🔭 &nbsp; This is a project including API and UAI tests for the 21vek website
+- 🔭 &nbsp; This project is a comprehensive testing suite designed for the 21vek online hypermarket. It includes both API and UI (User Interface) tests that ensure the website operates reliably and meets the expected performance benchmarks. The API testing component is focused on the backend services, validating the functionality, reliability, security, and performance of the web services. It checks the endpoints for correct responses, error handling, and adherence to the RESTful architecture principles.
 
 <h3>🛠 Tech Stack</h3>
 
