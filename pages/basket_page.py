@@ -1,11 +1,11 @@
 import data
-from pages.__init__ import BasePage, HelperTests
+from pages import BasePage, HelperTests
 
 
 class BasketPageLocators:
     BASKET_BUTTON = ".headerCartBox"
-    EMPTY_BASKET_HEADER = ".EmptyBasket_text__3fMyR"
-    HERE_BUTTON_EMPTY_BASKET = ".EmptyBasket_text__3fMyR .Link_link__qgZBw"
+    EMPTY_BASKET_HEADER = ".EmptyBasket_title__fTZV_"
+    V21_LOGO_FROM_BASKET = ".logotypeImg"
 
 
 class BasketPage(BasePage):
@@ -21,4 +21,4 @@ class BasketPage(BasePage):
         return path_text_empty_basket
 
     def click_here_link_empty_basket(self):
-        HelperTests.wait_click_css(self.driver, BasketPageLocators.HERE_BUTTON_EMPTY_BASKET)
+        HelperTests.wait_click_css(self.driver, BasketPageLocators.V21_LOGO_FROM_BASKET)
