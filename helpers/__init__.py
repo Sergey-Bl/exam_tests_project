@@ -7,3 +7,5 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver import ActionChains
 from datetime import datetime
+import allure
+import requests

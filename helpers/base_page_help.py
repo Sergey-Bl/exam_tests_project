@@ -1,6 +1,4 @@
-import allure
-
-from helpers.__init__ import By, EC, WebDriverWait, ActionChains, Keys
+from helpers.__init__ import By, EC, WebDriverWait, ActionChains, Keys, allure
 
 
 # ---------------------------------------------------------------
