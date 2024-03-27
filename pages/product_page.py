@@ -26,7 +26,7 @@ class ProductPage(BasePage):
         super().__init__(driver, data.DOMEN)
 
     def click_add_to_basket(self):
-        HelperTests.get_locator_from_css_wb_wait(self.driver, ProductLocators.PRODUCT_ADD_BASKET, 5).click()
+        HelperTests.get_locator_from_css_wb_wait(self.driver, ProductLocators.PRODUCT_ADD_BASKET, 10).click()
 
     def check_after_added_product(self):
         element_product_basket_check = HelperTests.get_locator_from_css_wb_wait(self.driver,

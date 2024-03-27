@@ -4,7 +4,7 @@ import pages
 
 class SearchLocators:
     SEARCH_RESULT = ".b-content > span"
-    PRODUCT_FROM_FIND_RANDOM = ".mindbox-pr-view.result__link"
+    PRODUCT_FROM_FIND_RANDOM = ".result__root"
     SEARCH_X_BUTTON = "Search_clearBtn__j9c8N"
 
 

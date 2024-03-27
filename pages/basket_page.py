@@ -1,11 +1,12 @@
-import data
-from pages import BasePage, HelperTests
+from pages import BasePage, HelperTests, data
 
 
 class BasketPageLocators:
     BASKET_BUTTON = ".headerCartBox"
     EMPTY_BASKET_HEADER = ".EmptyBasket_title__fTZV_"
     V21_LOGO_FROM_BASKET = ".logotypeImg"
+    REMOVE_PRODUCT_1_BASKET = '.ButtonsBlock_icon__x_nBQ'
+    REMOVE_YES_POP_UP_BASKET = '//*[@data-testid="modal-confirmation-button"]'
 
 
 class BasketPage(BasePage):
@@ -22,3 +23,7 @@ class BasketPage(BasePage):
 
     def click_here_link_empty_basket(self):
         HelperTests.wait_click_css(self.driver, BasketPageLocators.V21_LOGO_FROM_BASKET)
+
+    def remove_from_basket_product(self):
+        HelperTests.wait_click_css(self.driver, BasketPageLocators.REMOVE_PRODUCT_1_BASKET)
+        HelperTests.wait_click_xpath(self.driver, BasketPageLocators.REMOVE_YES_POP_UP_BASKET)

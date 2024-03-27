@@ -1,7 +1,5 @@
-import time
-import allure
 from selenium.common import StaleElementReferenceException
-
+import allure
 import data
 import pages
 
@@ -20,7 +18,8 @@ class MainPageLocators:
     USERNAME_LABEL = '//*[@class="userToolsSubtitle"]'
     LOGIN_TAP = "//*[contains(@class, 'style_baseActionButton__VyAyj')]"
     BASKET_LINK = "//div[contains(@class,'ProfileItem_itemText__h3Pbr') and contains(text(),'Корзина')]"
-
+    EXIT_LINK = '//*[@class="ProfileItem_itemCommon__DJPxF ProfileItem_itemLogout__RFHqc"]'
+    
 
 class MainPage(pages.BasePage):
     def __init__(self, driver):
@@ -52,8 +51,10 @@ class MainPage(pages.BasePage):
 
     def find_checker_field_result(self):
         search_field = pages.HelperTests.get_locator_from_xpath_wb_wait(self.driver, MainPageLocators.SEARCH_FIELD, 5)
+        pages.HelperTests.wait_click_xpath(self.driver, MainPageLocators.SEARCH_FIELD, 5)
         search_field.send_keys("Adidas")
-        pages.HelperTests.wait_click_css(self.driver, MainPageLocators.SEARCH_BUTTON, 5)
+        pages.HelperTests.get_locator_from_xpath_wb_wait(self.driver, MainPageLocators.SEARCH_FIELD, 5)
+        pages.HelperTests.wait_click_css(self.driver, MainPageLocators.SEARCH_BUTTON, 10)
 
         result_find = pages.HelperTests.get_locator_from_css_wb_wait(self.driver, pages.SearchLocators.SEARCH_RESULT,
                                                                      15)
@@ -84,8 +85,9 @@ class MainPage(pages.BasePage):
     def login_test_user(self):
         pages.HelperTests.wait_click_xpath(self.driver, MainPageLocators.ACCOUNT_BUTTON, 5)
         pages.HelperTests.wait_click_xpath(self.driver, MainPageLocators.LOGIN_BUTTON, 5)
-        pages.HelperTests.send_symbols(self.driver, MainPageLocators.USERNAME_FIELD, 'rubetta5064@awgarstone.com', 5)
-        pages.HelperTests.send_symbols(self.driver, MainPageLocators.PASSWORD_FIELD, 'b3719ec9', 5)
+        pages.HelperTests.send_symbols_xpath(self.driver, MainPageLocators.USERNAME_FIELD, 'rubetta5064@awgarstone.com',
+                                             5)
+        pages.HelperTests.send_symbols_xpath(self.driver, MainPageLocators.PASSWORD_FIELD, 'b3719ec9', 5)
         pages.HelperTests.wait_click_xpath(self.driver, MainPageLocators.LOGIN_TAP, 10)
 
     def tap_check_account_user(self):
@@ -101,3 +103,19 @@ class MainPage(pages.BasePage):
                                                                            'rubetta5064@awgarstone.com', 10
                                                                            )
         return text_label
+
+    def exit_user(self):
+        try:
+            pages.HelperTests.wait_click_xpath(self.driver, MainPageLocators.ACCOUNT_BUTTON, 5)
+        except StaleElementReferenceException:
+            pages.HelperTests.wait_click_xpath(self.driver, MainPageLocators.ACCOUNT_BUTTON, 5)
+        pages.HelperTests.get_locator_from_xpath_wb_wait(self.driver,
+                                                         MainPageLocators.BASKET_LINK, 10
+                                                         )
+        pages.HelperTests.wait_click_xpath(self.driver, MainPageLocators.EXIT_LINK, 10)
+
+    def check_login_button(self):
+        pages.HelperTests.wait_click_xpath(self.driver, MainPageLocators.ACCOUNT_BUTTON, 5)
+        login_button = pages.HelperTests.get_locator_from_xpath_wb_wait(self.driver, MainPageLocators.LOGIN_BUTTON, 5)
+        button_text = login_button.text
+        return button_text

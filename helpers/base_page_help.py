@@ -80,6 +80,17 @@ class HelperTests:
 
         element.click()
 
+    @allure.step("Клик с ожиданием xpath и использование visable")
+    def wait_click_xpath_visible(self, selector, timeout=5):
+        xpath = selector
+        locator = (By.XPATH, xpath)
+
+        element = WebDriverWait(self, timeout).until(
+            EC.visibility_of_element_located(locator)
+        )
+
+        element.click()
+
     @allure.step("Клик с ожиданием css")
     def wait_click_css(self, selector, timeout=5):
         css = selector
@@ -89,15 +100,26 @@ class HelperTests:
             EC.element_to_be_clickable(locator)
         ).click()
 
-    @allure.step("JS клик")
+    @allure.step("JS клик xpath")
     def force_click(self, locator):
         element = self.get_locator_from_xpath(locator)
+        self.execute_script("arguments[0].click();", element)
+
+    @allure.step("JS клик css")
+    def force_click_css(self, locator):
+        element = self.get_locator_from_css(locator)
         self.driver.execute_script("arguments[0].click();", element)
 
-    @allure.step("Обычный клик")
-    def click_on(self, locator):
+    @allure.step("Обычный клик xpath")
+    def click_on_xpath(self, locator):
         print(f'click on {locator}')
-        element = self.driver.find_element(By.XPATH, locator)
+        element = self.find_element(By.XPATH, locator)
+        element.click()
+
+    @allure.step("Обычный клик CSS")
+    def click_on_css(self, locator):
+        print(f'click on {locator}')
+        element = self.find_element(By.CSS_SELECTOR, locator)
         element.click()
 
     @allure.step("Нажатие мышкой")
@@ -106,18 +128,30 @@ class HelperTests:
         actions = ActionChains(self.driver)
         actions.click(element).perform()
 
-    @allure.step("Нажатие с клавиатуры")
-    def click_with_keyboard(self, locator):
-        element = self.driver.find_element(By.XPATH, locator)
+    @allure.step("Нажатие с клавиатуры XPATH")
+    def click_with_keyboard_xpath(self, locator):
+        element = self.find_element(By.XPATH, locator)
+        element.send_keys(Keys.ENTER)
+
+    @allure.step("Нажатие с клавиатуры XPATH")
+    def click_with_keyboard_css(self, locator):
+        element = self.find_element(By.CSS_SELECTOR, locator)
         element.send_keys(Keys.ENTER)
 
     # send/clear keys
-    @allure.step("Отправка символов в поле")
-    def send_symbols(self, locator_x, symbols, timeout=10):
-        locator = (By.XPATH, locator_x)
+    @allure.step("Отправка символов в поле xpath")
+    def send_symbols_xpath(self, locator_xpath, symbols, timeout=10):
+        element = WebDriverWait(self, timeout).until(
+            EC.visibility_of_element_located((By.XPATH, locator_xpath))
+        )
+        element.send_keys(symbols)
 
-        return WebDriverWait(self, timeout).until(
-            EC.visibility_of_element_located(locator)).send_keys(symbols)
+    @allure.step("Отправка символов в поле css")
+    def send_symbols_css(self, locator_css, symbols, timeout=10):
+        element = WebDriverWait(self, timeout).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, locator_css))
+        )
+        element.send_keys(symbols)
 
     @allure.step("Отчистка поля")
     def clear_symbols(self, locator):

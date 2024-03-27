@@ -117,3 +117,31 @@ def test_login_test_user(driver_chrome):
     text_label = pages.main_page.MainPage(driver_chrome).tap_check_account_user()
     text_expected = text_label.text
     HelperTests.assert_element_text(driver_chrome, text_expected, 'rubetta5064@awgarstone.com')
+
+
+@allure.title("Тест-012: Добавление продукта авторизированным юзером")
+@pytest.mark.user()
+def test_login_and_add_product(driver_chrome):
+    pages.main_page.MainPage(driver_chrome).login_test_user()
+    pages.main_page.MainPage(driver_chrome).tap_check_account_user()
+    pages.search_page.SearchPage(driver_chrome).find_and_select_product()
+    pages.product_page.ProductPage(driver_chrome).click_add_to_basket()
+    counter_check = pages.main_page.MainPage(driver_chrome).check_added_product_counter_basket()
+    element_product_basket_check = pages.product_page.ProductPage(driver_chrome).check_after_added_product()
+    HelperTests.assert_element_text(driver_chrome, element_product_basket_check.text, 'В корзине')
+    assert counter_check is not None and counter_check.text == '1'
+
+    pages.basket_page.BasketPage(driver_chrome).click_basket()
+    pages.basket_page.BasketPage(driver_chrome).remove_from_basket_product()
+    path_text_empty_basket = pages.basket_page.BasketPage(driver_chrome).check_empty_basket_result()
+    text_empty_basket = path_text_empty_basket.text
+    HelperTests.assert_element_text(driver_chrome, text_empty_basket, 'Корзина пуста')
+
+
+@allure.title("Тест-013: Вылогирование юзера")
+@pytest.mark.user()
+def test_exit_user(driver_chrome):
+    pages.main_page.MainPage(driver_chrome).login_test_user()
+    pages.main_page.MainPage(driver_chrome).exit_user()
+    button_text = pages.main_page.MainPage(driver_chrome).check_login_button()
+    assert button_text == "Аккаунт", f"Текст кнопки не соответствует ожидаемому. Актуальный текст: '{button_text}'"
