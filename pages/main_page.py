@@ -19,7 +19,7 @@ class MainPageLocators:
     LOGIN_TAP = "//*[contains(@class, 'style_baseActionButton__VyAyj')]"
     BASKET_LINK = "//div[contains(@class,'ProfileItem_itemText__h3Pbr') and contains(text(),'Корзина')]"
     EXIT_LINK = '//*[@class="ProfileItem_itemCommon__DJPxF ProfileItem_itemLogout__RFHqc"]'
-    
+
 
 class MainPage(pages.BasePage):
     def __init__(self, driver):
