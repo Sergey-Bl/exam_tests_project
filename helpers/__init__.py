@@ -9,3 +9,4 @@ from selenium.webdriver import ActionChains
 from datetime import datetime
 import allure
 import requests
+import logging

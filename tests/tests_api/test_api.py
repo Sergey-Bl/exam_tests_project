@@ -129,3 +129,16 @@ def test_user_logout(user_credentials, default_header_json_value):
             attempts += 1
             if attempts == max_attempts:
                 raise
+
+
+@allure.title("Тест-009: Проверка операции выхода из системы")
+@pytest.mark.api_opinion()
+def test_review_form(session, get_form_test_opinion):
+    response = get_form_test_opinion
+    HelperApiTests.assert_status_code_2xx(response)
+    assert 'id="form-add-review"' in response.text
+    assert 'name="data[Review][reviewer_name]"' in response.text
+    assert 'name="data[Review][reviewer_phone]"' in response.text
+    assert 'name="data[Review][review_text]"' in response.text
+    assert 'type="submit"' in response.text
+    assert 'id="agreement"' in response.text
