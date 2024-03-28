@@ -1,6 +1,3 @@
-import data.urls
-
-
 class BasePage:
 
     def __init__(self, driver, base_url):
