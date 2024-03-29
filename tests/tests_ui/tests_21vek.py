@@ -95,7 +95,7 @@ def test_add_in_favorite(driver):
 
 
 @allure.title("Тест-009: Проверка открытия и доступность поп апа/полей при добавлении мнения")
-@pytest.mark.product("test-009")
+@pytest.mark.product()
 def test_open_opinion_module(driver):
     pages.search_page.SearchPage(driver).find_and_select_product()
     pages.product_page.ProductPage(driver).opinion_link_click()
@@ -228,9 +228,9 @@ def test_footer(driver):
     ('123456', 'password', 'Неправильный формат электронной почты'),
     ('test@example.com', 'wrongpassword', 'Нет такого аккаунта. \nЗарегистрироваться?')
 ])
-@allure.title("Тест-20: Вход с невалидными данными")
+@allure.title("Тест-020: Вход с невалидными данными")
 @pytest.mark.user()
-def test_edit_user_value(driver, email, password, expected_error):
+def test_enter_incorrect_value(driver, email, password, expected_error):
     pages.main_page.MainPage(driver).login_test_incorrect_user(email, password)
     error_message = pages.main_page.MainPage(driver).receive_error_message()
     HelperTests.assert_element_text(error_message, expected_error)
