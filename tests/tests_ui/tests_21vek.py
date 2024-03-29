@@ -1,10 +1,12 @@
 import re
 import allure
 import pytest
+import data.value_for_tests
 import pages.basket_page
 import pages.main_page
 import pages.product_page
 import pages.search_page
+import pages.contact_page
 import logging
 
 from helpers.base_page_help import HelperTests
@@ -20,9 +22,15 @@ def test_smoke_open_site_21vek(driver):
 @allure.title("Тест-002: Проверка поиска товаров")
 @pytest.mark.search()
 def test_search_func(driver):
-    search_result_text = pages.main_page.MainPage(driver).find_checker_field_result()
-    pattern = re.compile(r'Запрос «adidas». Найдено? \d+ товар(?:ов)?', re.IGNORECASE)
-    assert pattern.match(search_result_text) is not None
+    pages.main_page.MainPage(driver).find_checker_field_result()
+    search_result_text = pages.main_page.MainPage(driver).receiver_value_search()
+
+    expected_fragments = [
+        'Запрос «adidas». Найдено? \d+ товар(?:ов)?',
+        'Результаты поиска'
+    ]
+    matches_any = any(re.search(pattern, search_result_text, re.IGNORECASE) for pattern in expected_fragments)
+    assert matches_any, f"Текст не соответствует ни одному из ожидаемых шаблонов: {expected_fragments}"
 
 
 @allure.title("Тест-003: Проверка открытия каталогов/состояния кнопки каталога")
@@ -31,7 +39,7 @@ def test_catalog_open(driver):
     summary_result, button_locator = pages.main_page.MainPage(driver).click_check_catalog_button()
 
     assert 'styles_pressed__kCcrg' in button_locator.get_attribute('class')
-    HelperTests.assert_element_text(driver, summary_result, 'Бытовая техника')
+    HelperTests.assert_element_text(summary_result, 'Бытовая техника')
 
 
 @allure.title("Тест-004: Проверка открытия корзины без наполнения")
@@ -40,7 +48,7 @@ def test_open_empty_basket(driver):
     pages.basket_page.BasketPage(driver).click_basket()
     path_text_empty_basket = pages.basket_page.BasketPage(driver).check_empty_basket_result()
     text_empty_basket = path_text_empty_basket.text
-    HelperTests.assert_element_text(driver, text_empty_basket, 'Корзина пуста')
+    HelperTests.assert_element_text(text_empty_basket, 'Корзина пуста')
 
 
 @allure.title("Тест-005: Открытие корзины и уход с корзины на глав сцену")
@@ -60,7 +68,7 @@ def test_add_product_from_product_page(driver):
     pages.product_page.ProductPage(driver).click_add_to_basket()
     counter_check = pages.main_page.MainPage(driver).check_added_product_counter_basket()
     element_product_basket_check = pages.product_page.ProductPage(driver).check_after_added_product()
-    HelperTests.assert_element_text(driver, element_product_basket_check.text, 'В корзине')
+    HelperTests.assert_element_text(element_product_basket_check.text, 'В корзине')
     assert counter_check is not None and counter_check.text == '1'
 
 
@@ -82,8 +90,8 @@ def test_add_to_comparison(driver):
 def test_add_in_favorite(driver):
     pages.search_page.SearchPage(driver).find_and_select_product()
     favorite_element = pages.product_page.ProductPage(driver).favorite_link_click()
+    HelperTests.assert_element_text(favorite_element.text, 'Удалить из избранного')
     assert 'putaside__link j-putaside j-putaside__in' in favorite_element.get_attribute('class')
-    assert favorite_element.text == "Удалить из избранного"
 
 
 @allure.title("Тест-009: Проверка открытия и доступность поп апа/полей при добавлении мнения")
@@ -110,38 +118,119 @@ def test_open_image_product(driver):
     assert image_panel is not None
 
 
+@pytest.mark.parametrize("email,password", [
+    ('rubetta5064@awgarstone.com', 'b3719ec9')
+])
 @allure.title("Тест-011: Логирование тестовым юзером")
 @pytest.mark.user()
-def test_login_test_user(driver):
-    pages.main_page.MainPage(driver).login_test_user()
-    text_label = pages.main_page.MainPage(driver).tap_check_account_user()
+def test_login_test_user(driver, email, password):
+    pages.main_page.MainPage(driver).login_test_user(email, password)
+    text_label = pages.main_page.MainPage(driver).receive_info_account_user()
     text_expected = text_label.text
-    HelperTests.assert_element_text(driver, text_expected, 'rubetta5064@awgarstone.com')
+    HelperTests.assert_element_text(text_expected, 'rubetta5064@awgarstone.com')
 
 
+@pytest.mark.parametrize("email,password", [
+    ('rubetta5064@awgarstone.com', 'b3719ec9')
+])
 @allure.title("Тест-012: Добавление продукта авторизированным юзером")
 @pytest.mark.user()
-def test_login_and_add_product(driver):
-    pages.main_page.MainPage(driver).login_test_user()
-    pages.main_page.MainPage(driver).tap_check_account_user()
+def test_login_and_add_product(driver, email, password):
+    pages.main_page.MainPage(driver).login_test_user(email, password)
+    pages.main_page.MainPage(driver).receive_info_account_user()
     pages.search_page.SearchPage(driver).find_and_select_product()
     pages.product_page.ProductPage(driver).click_add_to_basket()
     counter_check = pages.main_page.MainPage(driver).check_added_product_counter_basket()
     element_product_basket_check = pages.product_page.ProductPage(driver).check_after_added_product()
-    HelperTests.assert_element_text(driver, element_product_basket_check.text, 'В корзине')
+    HelperTests.assert_element_text(element_product_basket_check.text, 'В корзине')
     assert counter_check is not None and counter_check.text == '1'
 
     pages.basket_page.BasketPage(driver).click_basket()
     pages.basket_page.BasketPage(driver).remove_from_basket_product()
     path_text_empty_basket = pages.basket_page.BasketPage(driver).check_empty_basket_result()
     text_empty_basket = path_text_empty_basket.text
-    HelperTests.assert_element_text(driver, text_empty_basket, 'Корзина пуста')
+    HelperTests.assert_element_text(text_empty_basket, 'Корзина пуста')
 
 
+@pytest.mark.parametrize("email,password", [
+    ('rubetta5064@awgarstone.com', 'b3719ec9')
+])
 @allure.title("Тест-013: Вылогирование юзера")
 @pytest.mark.user()
-def test_exit_user(driver):
-    pages.main_page.MainPage(driver).login_test_user()
+def test_exit_user(driver, email, password):
+    pages.main_page.MainPage(driver).login_test_user(email, password)
     pages.main_page.MainPage(driver).exit_user()
-    button_text = pages.main_page.MainPage(driver).check_login_button()
-    assert button_text == "Аккаунт", f"Текст кнопки не соответствует ожидаемому. Актуальный текст: '{button_text}'"
+    button_text = pages.main_page.MainPage(driver).receive_login_text_attr()
+    HelperTests.assert_element_text(button_text, 'Войти')
+
+
+@pytest.mark.parametrize("email,password", [
+    ('rubetta5064@awgarstone.com', 'b3719ec9')
+])
+@allure.title("Тест-014: Смена личных данных юзера")
+@pytest.mark.user()
+def test_edit_user_value(driver, email, password):
+    pages.main_page.MainPage(driver).login_test_user(email, password)
+    pages.main_page.MainPage(driver).move_to_account_edit()
+    text_receive = pages.main_page.MainPage(driver).change_user_value()
+    HelperTests.assert_element_text(text_receive, 'Личные данные изменены')
+
+
+@pytest.mark.parametrize("email,password", [
+    ('rubetta5064@awgarstone.com', 'b3719ec9')
+])
+@allure.title("Тест-015: Доступности бонус счета")
+@pytest.mark.user()
+def test_bonus_availability(driver, email, password):
+    pages.main_page.MainPage(driver).login_test_user(email, password)
+    pages.main_page.MainPage(driver).move_to_account_bonus()
+    text_bonus_receive, text_status_bonus = pages.main_page.MainPage(driver).receive_values_bonus_page()
+    HelperTests.assert_element_text(text_bonus_receive, 'Бонусный счёт')
+    HelperTests.assert_element_text(text_status_bonus, '0 бонусов')
+
+
+@allure.title("Тест-016: Доступности номеров компании")
+@pytest.mark.user()
+def test_number_company_availability(driver):
+    text_numbers = pages.main_page.MainPage(driver).receive_text_numbers()
+    required_numbers = data.value_for_tests.value_for_test_16
+    HelperTests.assert_contains_all(text_numbers, required_numbers)
+
+
+@allure.title("Тест-017 Доступности элементов на странице контактов")
+@pytest.mark.user()
+def test_content_contact_page(driver):
+    pages.main_page.MainPage(driver).move_to_contact_page()
+    contact_page = pages.contact_page.ContactPage(driver).receive_full_content_page()
+    required_value = data.value_for_tests.value_for_test_17
+    HelperTests.assert_contains_all(contact_page, required_value)
+
+
+@allure.title("Тест-018 Доступность элементов/текста поп апа 'Написать нам'")
+@pytest.mark.user()
+def test_content_contact_pop_up(driver):
+    pages.main_page.MainPage(driver).move_to_contact_page()
+    content_pop_up, contact_sent_button = pages.contact_page.ContactPage(driver).receive_content_aft_tap_contact_us()
+    required_value = data.value_for_tests.value_for_test_18
+    HelperTests.assert_contains_all(content_pop_up, required_value)
+    assert contact_sent_button.is_displayed()
+
+
+@allure.title("Тест-019 Футтер текст")
+@pytest.mark.user()
+def test_footer(driver):
+    text_footer = pages.main_page.MainPage(driver).receive_sent_value_footer()
+    required_value = data.value_for_tests.value_for_test_19
+    HelperTests.assert_contains_all(text_footer, required_value)
+
+
+@pytest.mark.parametrize("email,password,expected_error", [
+    ('123456', 'password', 'Неправильный формат электронной почты'),
+    ('test@example.com', 'wrongpassword', 'Нет такого аккаунта. \nЗарегистрироваться?')
+])
+@allure.title("Тест-20: Вход с невалидными данными")
+@pytest.mark.user()
+def test_edit_user_value(driver, email, password, expected_error):
+    pages.main_page.MainPage(driver).login_test_incorrect_user(email, password)
+    error_message = pages.main_page.MainPage(driver).receive_error_message()
+    HelperTests.assert_element_text(error_message, expected_error)

@@ -169,7 +169,19 @@ class HelperTests:
         actual_title = self.title
         assert actual_title == expected_title, f"Expected title:{expected_title}, byt got {actual_title}"
 
+    @staticmethod
     @allure.step("Сравнение текста полученного с ассерт заложенным")
-    def assert_element_text(self, element, expected_text):
-        actual_text = element
+    def assert_element_text(actual_text, expected_text):
         assert expected_text == actual_text, f"Expected text: {expected_text}, but got: {actual_text}"
+
+    @staticmethod
+    @allure.step("Проверка наличия определенных фрагментов текста")
+    def assert_contains_all(text, required_fragments):
+        missing_fragments = [fragment for fragment in required_fragments if fragment not in text]
+        assert not missing_fragments, f"Текст не содержит следующие фрагменты: {missing_fragments}"
+
+    @staticmethod
+    @allure.step("Проверка наличия одного из ожидаемых фрагментов текста")
+    def assert_contains_any(text, possible_fragments):
+        if not any(fragment in text for fragment in possible_fragments):
+            assert False, f"Ни один из ожидаемых фрагментов не найден в тексте: {possible_fragments}"
