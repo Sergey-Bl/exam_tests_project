@@ -11,15 +11,13 @@
 
 <h3>🛠 Tech Stack</h3>
 
-- 💻 &nbsp; Python | Pytest
-- 🌐 &nbsp; Selenium WebDriver
-
-<br>
-
-
-</br>
-
-
+- 💻 &nbsp; **Python** | Основной язык программирования, используемый для написания тестов.
+- 🧪 &nbsp; **Pytest** | Фреймворк для модульного и функционального тестирования, обеспечивающий удобные механизмы
+  ассертов и фикстур.
+- 🌐 &nbsp; **Selenium WebDriver** | Инструмент для автоматизации действий веб-браузера, используемый в UI тестировании.
+- 📊 &nbsp; **Allure Framework** | Инструмент для визуализации результатов тестирования, предоставляющий подробные
+  отчеты.
+- 📁 &nbsp; **Git** | Система контроля версий для отслеживания изменений в коде тестов и совместной работы.
 
 <h3> 🤝🏻 Connect with Me if need</h3>
 
@@ -29,15 +27,24 @@
 
 ⭐️ From [SergeyBl](https://github.com/Sergey-Bl)
 
+## Установка и настройка
+
+### Установка Python
+
+Перед тем, как приступить к работе, убедитесь, что на вашем компьютере установлен Python версии 3.6 или выше. Вы можете
+скачать Python с официального сайта: [python.org](https://www.python.org/).
+
+### Установка зависимостей
+
+Перед началом тестов установите все необходимые зависимости из файла `requirements.txt` с помощью следующей команды,
+выполняемой в корне проекта:
+`pip install -r requirements.txt`
+
 # **Manual test run start:**
 
 ## **For start API tests:**
 
-**1 command for run tests:** `pytest tests/tests_api/test_api.py --alluredir=logs`
-
-**2 command to create report:** `allure generate tests/tests_api/logs -o reports --clean`
-
-_Without report/allure_:`pytest tests/tests_api/test_api.py`
+**Сommand for run tests:** `pytest tests/tests_api/test_api.py`
 
 **Module tests runs:**
 
@@ -47,20 +54,27 @@ User API - `pytest -m api_user tests/tests_api/test_api.py`
 
 ## **For start UI tests:**
 
-**1 command for run tests:** `pytest tests/tests_ui/tests_21vek.py --alluredir=logs`
+**Сommand for run tests:** `pytest tests/tests_ui/tests_21vek.py`
 
-**2 command to create report:** `allure generate tests/tests_api/logs -o reports --clean`
+Запуск тестов по браузерам(В данный момент не все тесты в headless моде проходят успешно / это известная проблема)
 
-_Without report/allure:_
-`pytest tests/tests_ui/tests_21vek.py`
-
-Запуск тестов по браузерам
 `pytest --headless=no --browser=chrome`
+
 `pytest --headless=yes --browser=firefox`
+
 headless меняем на yes/no в зависимости от нужности
+
+----
+
+#### **После запуска тестов и когда они прошли можно сгенерировать репорт командой `allure serve allure_logs`**
+
+----
 
 # **FAST tests run:**
 
 **API:** File for run API tests and collect allure report = **_run_api_tests.sh_** - `located /test_runners`
 
 **UI:** File for run UI tests and collect allure report = **_run_ui_tests.sh_** - `located /test_runners`
+
+
+----

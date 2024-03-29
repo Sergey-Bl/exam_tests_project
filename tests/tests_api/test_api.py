@@ -59,7 +59,7 @@ def test_basket_request():
 def test_about_request():
     expected_url = f'{urls.URL_ABOUT_COMPANY_PAGE}'
     attempts = 0
-    max_attempts = 2
+    max_attempts = 5
     while attempts < max_attempts:
         try:
             r_get = session.get(expected_url)
@@ -76,9 +76,18 @@ def test_about_request():
 @pytest.mark.api_smoke()
 def test_about_request():
     expected_url = f'{urls.URL_ABOUT_COMPANY_PAGE}'
-    r_get = session.get(expected_url)
-    HelperApiTests.assert_status_code_2xx(r_get)
-    assert r_get.headers.get("content-type") == "text/html; charset=UTF-8"
+    attempts = 0
+    max_attempts = 5
+    while attempts < max_attempts:
+        try:
+            r_get = session.get(expected_url)
+            HelperApiTests.assert_status_code_2xx(r_get)
+            assert r_get.headers.get("content-type") == "text/html; charset=UTF-8"
+            break
+        except requests.exceptions.RequestException:
+            attempts += 1
+            if attempts == max_attempts:
+                raise
 
 
 @allure.title("Тест-007: Авторизация пользователя")
@@ -88,7 +97,7 @@ def test_user_login(user_credentials, default_header_json_value):
     url = urls.URL_LOGIN
     headers = default_header_json_value
 
-    max_attempts = 3
+    max_attempts = 5
     for attempt in range(1, max_attempts + 1):
         try:
             response = session.post(url, headers=headers, data=json.dumps(payload))
@@ -135,10 +144,20 @@ def test_user_logout(user_credentials, default_header_json_value):
 @pytest.mark.api_opinion()
 def test_review_form(session, get_form_test_opinion):
     response = get_form_test_opinion
-    HelperApiTests.assert_status_code_2xx(response)
-    assert 'id="form-add-review"' in response.text
-    assert 'name="data[Review][reviewer_name]"' in response.text
-    assert 'name="data[Review][reviewer_phone]"' in response.text
-    assert 'name="data[Review][review_text]"' in response.text
-    assert 'type="submit"' in response.text
-    assert 'id="agreement"' in response.text
+
+    attempts = 0
+    max_attempts = 5
+    while attempts < max_attempts:
+        try:
+            HelperApiTests.assert_status_code_2xx(response)
+            assert 'id="form-add-review"' in response.text
+            assert 'name="data[Review][reviewer_name]"' in response.text
+            assert 'name="data[Review][reviewer_phone]"' in response.text
+            assert 'name="data[Review][review_text]"' in response.text
+            assert 'type="submit"' in response.text
+            assert 'id="agreement"' in response.text
+            break
+        except requests.exceptions.RequestException:
+            attempts += 1
+            if attempts == max_attempts:
+                raise

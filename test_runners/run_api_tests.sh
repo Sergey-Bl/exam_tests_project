@@ -1,2 +1,2 @@
-pytest tests/tests_api/test_api.py --alluredir=logs
+pytest tests/tests_api/tests_api.py --alluredir=reports
 allure generate logs -o reports --clean

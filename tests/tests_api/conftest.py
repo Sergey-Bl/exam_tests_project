@@ -1,17 +1,23 @@
 from logging.handlers import RotatingFileHandler
-
+import shutil
 import pytest
 import requests
 import logging
-
+import os
 import data
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-file_handler = RotatingFileHandler('test_results.log', maxBytes=1024 * 1024 * 5, backupCount=2)
+
+log_file_path = 'logger/test_results_api.log'
+
+log_dir = os.path.dirname(log_file_path)
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+file_handler = RotatingFileHandler(log_file_path, maxBytes=1024 * 1024 * 5, backupCount=2)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(formatter)
-
 logger.addHandler(file_handler)
 
 
@@ -68,5 +74,24 @@ def pytest_runtest_makereport(item):
     outcome = yield
     rep = outcome.get_result()
 
-    if rep.when == "call":
+    if rep.when == "call" and rep.failed:
+        try:
+            if item.rep_call.longrepr:
+                msg = item.rep_call.longreprtext
+            else:
+                msg = item.rep_call.longrepr
+            logger.error(f"Ошибка в тесте {item.nodeid}: {msg}")
+        except AttributeError:
+            logger.error(f"Ошибка в тесте {item.nodeid}, но подробности недоступны.")
+    elif rep.when == "call":
         item.rep_call = rep
+
+
+def pytest_sessionstart(session):
+    allure_logs_dir = "allure_logs"
+    if os.path.exists(allure_logs_dir):
+        shutil.rmtree(allure_logs_dir)
+    os.makedirs(allure_logs_dir, exist_ok=True)
+
+    if os.path.exists(log_file_path):
+        open(log_file_path, 'w').close()

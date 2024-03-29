@@ -1,6 +1,4 @@
-from helpers.__init__ import datetime, requests, logging
-from logging.handlers import RotatingFileHandler
-import os
+from helpers.__init__ import datetime, requests
 
 
 class HelperApiTests:
@@ -31,5 +29,3 @@ class HelperApiTests:
 
     def assert_status_code_5xx(response):
         assert 500 <= response.status_code < 600, f"Ожидался код из диапазона 500-599, получен: {response.status_code}"
-
-

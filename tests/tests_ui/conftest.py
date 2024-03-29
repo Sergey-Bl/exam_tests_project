@@ -1,10 +1,28 @@
-import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 import pages
+from logging.handlers import RotatingFileHandler
+import pytest
+import logging
+import os
+import shutil
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+log_file_path = 'logger/test_results_ui.log'
+
+log_dir = os.path.dirname(log_file_path)
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+file_handler = RotatingFileHandler(log_file_path, maxBytes=1024 * 1024 * 5, backupCount=2)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 
 def create_driver_chrome(headless):
@@ -23,7 +41,7 @@ def create_driver_firefox(headless):
     return driver
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(autouse=True)
 def driver(request):
     headless = request.config.getoption('--headless')
     browser_type = request.config.getoption('--browser')
@@ -60,3 +78,32 @@ def pytest_addoption(parser):
         default='chrome',
         help='Choose browser to run tests: chrome or firefox'
     )
+
+
+@pytest.fixture(autouse=True)
+def test_logger(request):
+    logger.info(f"Начало теста: {request.node.nodeid}")
+    yield
+    if hasattr(request.node, "rep_call"):
+        if request.node.rep_call.passed:
+            logger.info(f"Тест успешно пройден: {request.node.nodeid}")
+        elif request.node.rep_call.failed:
+            logger.error(f"Тест провален: {request.node.nodeid}")
+        elif request.node.rep_call.skipped:
+            logger.warning(f"Тест пропущен: {request.node.nodeid}")
+
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item):
+    outcome = yield
+    rep = outcome.get_result()
+
+    if rep.when == "call":
+        item.rep_call = rep
+
+
+def pytest_sessionstart(session):
+    logs_dir = "allure_logs"
+    if os.path.exists(logs_dir):
+        shutil.rmtree(logs_dir)
+    os.makedirs(logs_dir, exist_ok=True)
