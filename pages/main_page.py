@@ -1,8 +1,8 @@
-import random
-import allure
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException
+
 import data
 import pages
-from selenium.common import StaleElementReferenceException, TimeoutException, NoSuchElementException
+from pages import allure, random
 
 
 class MainPageLocators:

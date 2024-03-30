@@ -1,5 +1,10 @@
-import json, allure, pytest, requests
+import json
 from datetime import datetime, timezone
+
+import requests
+import pytest
+import allure
+
 from data import urls
 from helpers.base_help_api import HelperApiTests
 
@@ -110,7 +115,7 @@ def test_user_login(user_credentials, default_header_json_value):
                 raise
 
 
-@allure.title("Тест-008: Проверка операции выхода из системы")
+@allure.title("Тест-008: Операции выхода из системы")
 @pytest.mark.api_user()
 def test_user_logout(user_credentials, default_header_json_value):
     payload = {
@@ -133,6 +138,7 @@ def test_user_logout(user_credentials, default_header_json_value):
                 data=json.dumps({"route": "logout", "parameters": {}})
             )
             assert response.headers.get('x-gate-user-id') != '14372444'
+            assert response.headers.get('x-gate-user-id') is None
             break
         except requests.exceptions.ProxyError:
             attempts += 1
@@ -140,7 +146,7 @@ def test_user_logout(user_credentials, default_header_json_value):
                 raise
 
 
-@allure.title("Тест-009: Проверка операции выхода из системы")
+@allure.title("Тест-009: Ревью форма")
 @pytest.mark.api_opinion()
 def test_review_form(session, get_form_test_opinion):
     response = get_form_test_opinion
@@ -161,3 +167,70 @@ def test_review_form(session, get_form_test_opinion):
             attempts += 1
             if attempts == max_attempts:
                 raise
+
+
+@allure.title("Тест-010: Вход с невалидными данными")
+@pytest.mark.api_user()
+def test_user_fail_login(default_header_json_value):
+    payload = {"User": {
+        "email": "rubetta506",
+        "password": "b371asd9ec9"
+    }}
+    url = urls.URL_LOGIN
+    headers = default_header_json_value
+
+    response = session.post(url, headers=headers, data=json.dumps(payload))
+    assert response.headers.get('x-gate-user-id') == ''
+
+
+@allure.title("Тест-011: Попытка доступа с изменённым x-gate-user-id после авторизации")
+@pytest.mark.api_security()
+@pytest.mark.skip(reason="21 век банит за этот кейс")
+def test_user_access_with_modified_userid(user_credentials, default_header_json_value):
+    payload = {"User": user_credentials}
+    login_url = urls.URL_LOGIN
+    protected_url = urls.URL_LOGIN
+    headers = default_header_json_value
+
+    login_response = session.post(login_url, headers=headers, data=json.dumps(payload))
+    assert login_response.headers.get('x-gate-user-id') == '14372444', "UserID не соответствует ожидаемому"
+    modified_user_id = "12345678"
+    modified_headers = {**headers, 'x-gate-user-id': modified_user_id}
+
+    protected_response = session.put(protected_url, headers=modified_headers)
+
+    assert protected_response.status_code in [401, 403]
+
+
+@allure.title("Тест-012: Вход с невалидными данными")
+@pytest.mark.api_user()
+def test_user_fail_login_sql_inq(default_header_json_value):
+    payload = {"User": {
+        "email": "--/**&^%$%^&",
+        "password": "--/**&^%$%^&"
+    }}
+    url = urls.URL_LOGIN
+    headers = default_header_json_value
+
+    response = session.post(url, headers=headers, data=json.dumps(payload))
+    response_data = response.json()
+    expected_error = "Ошибка валидации поля email"
+    assert response_data.get(
+        'error') == expected_error
+
+
+@allure.title("Тест-013: Вход с невалидным паролем")
+@pytest.mark.api_user()
+def test_user_fail_login_sql_inq(default_header_json_value):
+    payload = {"User": {
+        "email": "rubetta5064@awgarstone.com",
+        "password": "--/**&^%$%^&"
+    }}
+    url = urls.URL_LOGIN
+    headers = default_header_json_value
+
+    response = session.post(url, headers=headers, data=json.dumps(payload))
+    response_data = response.json()
+    expected_error = "Неправильный пароль"
+    assert response_data.get(
+        'error') == expected_error

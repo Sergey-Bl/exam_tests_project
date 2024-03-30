@@ -1,15 +1,16 @@
+import logging
 import re
+
 import allure
 import pytest
+
+from helpers.base_page_help import HelperTests
 import data.value_for_tests
 import pages.basket_page
+import pages.contact_page
 import pages.main_page
 import pages.product_page
 import pages.search_page
-import pages.contact_page
-import logging
-
-from helpers.base_page_help import HelperTests
 
 
 @allure.title("Тест-001: Проверка заголовка главной страницы 21vek.by")

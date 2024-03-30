@@ -1,15 +1,17 @@
-import os
 import logging
-from logging.handlers import RotatingFileHandler
+import os
 import shutil
+from datetime import datetime
+from logging.handlers import RotatingFileHandler
+
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
+
 import pages
-from datetime import datetime
 
 LOG_DIR = 'logger'
 LOG_FILE = 'test_results_ui.log'
@@ -86,7 +88,7 @@ def test_logger(request):
 
 
 def pytest_sessionstart(session):
-    for directory in [LOG_DIR, SCREENSHOTS_DIR, 'allure_logs']:
+    for directory in [SCREENSHOTS_DIR, 'allure_logs']:
         if os.path.exists(directory):
             shutil.rmtree(directory)
         os.makedirs(directory, exist_ok=True)

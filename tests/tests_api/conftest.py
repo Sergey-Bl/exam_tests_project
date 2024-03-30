@@ -1,9 +1,11 @@
-from logging.handlers import RotatingFileHandler
-import shutil
-import pytest
-import requests
 import logging
 import os
+import shutil
+from logging.handlers import RotatingFileHandler
+
+import pytest
+import requests
+
 import data
 
 logging.basicConfig(level=logging.DEBUG)
