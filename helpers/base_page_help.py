@@ -100,7 +100,7 @@ class HelperTests:
 
     @allure.step("JS клик xpath")
     def force_click(self, locator):
-        element = self.get_locator_from_xpath(locator)
+        element = self.find_element(By.XPATH, locator)
         self.execute_script("arguments[0].click();", element)
 
     @allure.step("JS клик css")

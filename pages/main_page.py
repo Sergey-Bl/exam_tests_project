@@ -2,7 +2,7 @@ import random
 import allure
 import data
 import pages
-from selenium.common import StaleElementReferenceException, TimeoutException
+from selenium.common import StaleElementReferenceException, TimeoutException, NoSuchElementException
 
 
 class MainPageLocators:
@@ -167,8 +167,12 @@ class MainPage(pages.BasePage):
 
         unique_text = generate_random_string("test")
         pages.HelperTests.send_symbols_xpath(self.driver, MainPageLocators.EDIT_NAME_USER_FIELD, unique_text)
-
-        pages.HelperTests.wait_click_xpath(self.driver, MainPageLocators.SAVE_EDIT_US_VALUE, 5)
+        try:
+            pages.HelperTests.force_click(self.driver, MainPageLocators.SAVE_EDIT_US_VALUE)
+        except NoSuchElementException:
+            unique_text = generate_random_string("test")
+            pages.HelperTests.send_symbols_xpath(self.driver, MainPageLocators.EDIT_NAME_USER_FIELD, unique_text)
+            pages.HelperTests.force_click(self.driver, MainPageLocators.SAVE_EDIT_US_VALUE)
 
         text_successful = pages.HelperTests.get_locator_from_xpath_wb_wait(self.driver,
                                                                            MainPageLocators.CONTENT_EDITED_VALUE, 2)
@@ -204,9 +208,8 @@ class MainPage(pages.BasePage):
 
     @allure.description("Переход на страницу контакты")
     def move_to_contact_page(self):
-        pages.HelperTests.wait_click_xpath(self.driver,
-                                           MainPageLocators.CONTACT_LINK,
-                                           10)
+        pages.HelperTests.force_click(self.driver,
+                                      MainPageLocators.CONTACT_LINK)
 
     @allure.description("Получение данные в футере")
     def receive_sent_value_footer(self):

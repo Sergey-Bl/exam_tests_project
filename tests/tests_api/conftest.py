@@ -10,7 +10,6 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 log_file_path = 'logger/test_results_api.log'
-
 log_dir = os.path.dirname(log_file_path)
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
@@ -95,3 +94,4 @@ def pytest_sessionstart(session):
 
     if os.path.exists(log_file_path):
         open(log_file_path, 'w').close()
+        

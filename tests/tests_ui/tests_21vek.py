@@ -167,6 +167,8 @@ def test_exit_user(driver, email, password):
     ('rubetta5064@awgarstone.com', 'b3719ec9')
 ])
 @allure.title("Тест-014: Смена личных данных юзера")
+@allure.description("В headless моде ошибка / появляется чекбокс к поп апе который невозможно отловить вне хедлес мода,"
+                    "защита какая-то или баг, обойти пока не вышло")
 @pytest.mark.user()
 def test_edit_user_value(driver, email, password):
     pages.main_page.MainPage(driver).login_test_user(email, password)
@@ -197,7 +199,7 @@ def test_number_company_availability(driver):
 
 
 @allure.title("Тест-017 Доступности элементов на странице контактов")
-@pytest.mark.user()
+@pytest.mark.contact_us()
 def test_content_contact_page(driver):
     pages.main_page.MainPage(driver).move_to_contact_page()
     contact_page = pages.contact_page.ContactPage(driver).receive_full_content_page()
@@ -206,7 +208,7 @@ def test_content_contact_page(driver):
 
 
 @allure.title("Тест-018 Доступность элементов/текста поп апа 'Написать нам'")
-@pytest.mark.user()
+@pytest.mark.contact_us()
 def test_content_contact_pop_up(driver):
     pages.main_page.MainPage(driver).move_to_contact_page()
     content_pop_up, contact_sent_button = pages.contact_page.ContactPage(driver).receive_content_aft_tap_contact_us()
@@ -216,7 +218,7 @@ def test_content_contact_pop_up(driver):
 
 
 @allure.title("Тест-019 Футтер текст")
-@pytest.mark.user()
+@pytest.mark.footer()
 def test_footer(driver):
     text_footer = pages.main_page.MainPage(driver).receive_sent_value_footer()
     required_value = data.value_for_tests.value_for_test_19
