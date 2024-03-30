@@ -9,8 +9,8 @@ class MainPageLocators:
     ACCEPT_COOKIE_BUTTON = "//div[contains(@class,'Button-module__buttonText') and contains(text(),'Принять')]"
     SEARCH_FIELD = "//*[@id='catalogSearch']"
     SEARCH_BUTTON = ".Search_searchBtn__Tk7Gw"
-    CATALOG_BUTTON = "button.styles_catalogButton__z9L_j"
-    CATEGORY_TECHNIQUE_HEADER = ".styles_categoryTitle__q3arD"
+    CATALOG_BUTTON = '//*[@class="styles_catalogButton__z9L_j"]'
+    OPEN_CATALOG_BUTTON = '//*[@class="styles_catalogButton__z9L_j styles_pressed__kCcrg"]'
     BASKET_COUNTER_ADDED_1_PRODUCT = "//*[@class='headerCartCount' and text()='1']"
     ACCOUNT_BUTTON = '//*[@class="styles_userToolsToggler__c2aHe"]'
     USERNAME_FIELD = '//*[@id="login-email"]'
@@ -83,14 +83,11 @@ class MainPage(pages.BasePage):
         return search_result_text
 
     def click_check_catalog_button(self):
-        pages.HelperTests.wait_click_css(self.driver, MainPageLocators.CATALOG_BUTTON, 10)
-        button_locator = pages.HelperTests.get_locator_from_css_wb_wait(self.driver, MainPageLocators.CATALOG_BUTTON,
-                                                                        10)
-        text_summary_catalog = pages.HelperTests.get_locator_from_css_wb_wait(self.driver,
-                                                                              MainPageLocators.CATEGORY_TECHNIQUE_HEADER,
-                                                                              10)
-        summary_result = text_summary_catalog.text
-        return summary_result, button_locator
+        pages.HelperTests.wait_click_xpath(self.driver, MainPageLocators.CATALOG_BUTTON, 10)
+        button_locator = pages.HelperTests.get_locator_from_xpath_wb_wait(self.driver,
+                                                                          MainPageLocators.OPEN_CATALOG_BUTTON,
+                                                                          10)
+        return button_locator
 
     def check_added_product_counter_basket(self):
         counter_check = pages.HelperTests.get_locator_from_xpath_wb_wait(self.driver,

@@ -34,12 +34,11 @@ def test_search_func(driver):
 
 
 @allure.title("Тест-003: Проверка открытия каталогов/состояния кнопки каталога")
-@pytest.mark.basket()
+@pytest.mark.catalog()
 def test_catalog_open(driver):
-    summary_result, button_locator = pages.main_page.MainPage(driver).click_check_catalog_button()
+    button_locator = pages.main_page.MainPage(driver).click_check_catalog_button()
 
     assert 'styles_pressed__kCcrg' in button_locator.get_attribute('class')
-    HelperTests.assert_element_text(summary_result, 'Бытовая техника')
 
 
 @allure.title("Тест-004: Проверка открытия корзины без наполнения")

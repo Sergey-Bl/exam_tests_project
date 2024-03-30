@@ -9,6 +9,7 @@ import pytest
 import logging
 import os
 import shutil
+import random
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -29,6 +30,8 @@ def create_driver_chrome(headless):
     chrome_options = webdriver.ChromeOptions()
     if headless == 'yes':
         chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--window-size=1920,1080')  # Установка размера окна
+        chrome_options.add_argument('--disable-gpu')  # Отключение GPU
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)
     return driver
 
@@ -37,6 +40,7 @@ def create_driver_firefox(headless):
     firefox_options = webdriver.FirefoxOptions()
     if headless == 'yes':
         firefox_options.add_argument('--headless')
+        firefox_options.add_argument('--window-size=1920,1080')  # Установка размера окна
     driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=firefox_options)
     return driver
 
@@ -53,7 +57,6 @@ def driver(request):
     else:
         raise ValueError(f"Unsupported browser: {browser_type}")
 
-    driver.maximize_window()
     driver.delete_all_cookies()
 
     main_page = pages.main_page.MainPage(driver)
@@ -107,3 +110,9 @@ def pytest_sessionstart(session):
     if os.path.exists(logs_dir):
         shutil.rmtree(logs_dir)
     os.makedirs(logs_dir, exist_ok=True)
+
+    # Очистка папки логов
+    logger_dir = "logger"
+    if os.path.exists(logger_dir):
+        shutil.rmtree(logger_dir)
+    os.makedirs(logger_dir, exist_ok=True)

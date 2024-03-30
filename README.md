@@ -56,7 +56,7 @@ User API - `pytest -m api_user tests/tests_api/test_api.py`
 
 **Сommand for run tests:** `pytest tests/tests_ui/tests_21vek.py`
 
-Запуск тестов по браузерам(В данный момент не все тесты в headless моде проходят успешно / это известная проблема)
+Запуск тестов по браузерам
 
 `pytest --headless=no --browser=chrome`
 
