@@ -38,6 +38,7 @@ class MainPage(pages.BasePage):
     def __init__(self, driver):
         super().__init__(driver, data.DOMEN)
 
+    @allure.description("принятие куков поп ап")
     def cookie_accept(self):
         try:
             pages.HelperTests.wait_click_xpath(self.driver,
@@ -48,6 +49,7 @@ class MainPage(pages.BasePage):
         except pages.TimeoutException:
             pages.logging.error('Timed out waiting for the cookie pop-up')
 
+    @allure.description("открытие ссылки и принимание поп апов куков")
     def open_url_accept_cookie(self):
         self.open_base_url()
         self.cookie_accept()
@@ -94,6 +96,7 @@ class MainPage(pages.BasePage):
                                                                          MainPageLocators.BASKET_COUNTER_ADDED_1_PRODUCT)
         return counter_check
 
+    @allure.description("Отчистка поискового поля")
     def clear_search_field(self):
 
         search_field = pages.HelperTests.get_locator_from_xpath_wb_wait(self.driver, MainPageLocators.SEARCH_FIELD, 10)

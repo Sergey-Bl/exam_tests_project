@@ -23,14 +23,6 @@ logger.addHandler(file_handler)
 
 
 @pytest.fixture(scope="module")
-def user_credentials():
-    return {
-        "email": "rubetta5064@awgarstone.com",
-        "password": "b3719ec9"
-    }
-
-
-@pytest.fixture(scope="module")
 def get_form_test_opinion(session, default_header_json_value):
     url = data.urls.URL_OPINION_REST
     params = {
@@ -45,8 +37,18 @@ def get_form_test_opinion(session, default_header_json_value):
 def default_header_json_value():
     return {
         "Host": "www.21vek.by",
-        "Content-Type": "application/json",
-        "Accept": "application/json;version=1.1"
+        "Connection": "keep-alive",
+        "DNT": "1",
+        "sec-ch-ua-mobile": "?0",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "X-Requested-With": "XMLHttpRequest",
+        "sec-ch-ua-platform": "\"macOS\"",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Dest": "empty",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en,en-US;q=0.9,ru;q=0.8"
     }
 
 

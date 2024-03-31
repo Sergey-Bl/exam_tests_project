@@ -76,9 +76,9 @@ def test_add_product_from_product_page(driver):
 @pytest.mark.product()
 def test_add_to_comparison(driver):
     pages.search_page.SearchPage(driver).find_and_select_product()
-    pages.product_page.ProductPage(driver).click_campare_link_add_remove()
+    pages.product_page.ProductPage(driver).click_compare_link_add_remove()
     check_available_campare, check_counter_campare = pages.product_page.ProductPage(
-        driver).campare_added_products_check()
+        driver).compare_added_products_check()
     if not check_available_campare.is_enabled():
         logging.error("Element is not active after add product")
     assert check_available_campare.is_enabled()

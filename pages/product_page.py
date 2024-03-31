@@ -6,8 +6,8 @@ class ProductLocators:
     PRODUCT_ADD_BASKET = ".item__buybtn"
     ADD_BASKET_BUTTON_AFTER_CLICK = ".j-button-clicked"
     COMPARE_LINK_ADD_RM = ".compare__link.g-pseudo_href"
-    CAMPARE_LINK_PRODUCT_ADDED = ".compare__link.cr-compare__result"
-    CAMPARE_COUNTER = ".g-counter.j-compare_counter"
+    COMPARE_LINK_PRODUCT_ADDED = ".compare__link.cr-compare__result"
+    COMPARE_COUNTER = ".g-counter.j-compare_counter"
     ADD_TO_FAVORITE = ".putaside__link.j-putaside"
     OPINION_LINK = "#j-tab_activate-review"
     ADD_OPINION_BUTTON = "#j-reviews__addlink button"
@@ -34,17 +34,17 @@ class ProductPage(BasePage):
                                                                                 5)
         return element_product_basket_check
 
-    def click_campare_link_add_remove(self):
-        campare_link = HelperTests.get_locator_from_css_wb_wait(self.driver, ProductLocators.COMPARE_LINK_ADD_RM)
-        campare_link.click()
+    def click_compare_link_add_remove(self):
+        compare_link = HelperTests.get_locator_from_css_wb_wait(self.driver, ProductLocators.COMPARE_LINK_ADD_RM)
+        compare_link.click()
 
-    def campare_added_products_check(self):
-        check_available_campare = HelperTests.get_locator_from_css_wb_wait(self.driver,
-                                                                           ProductLocators.CAMPARE_LINK_PRODUCT_ADDED,
+    def compare_added_products_check(self):
+        check_available_compare = HelperTests.get_locator_from_css_wb_wait(self.driver,
+                                                                           ProductLocators.COMPARE_LINK_PRODUCT_ADDED,
                                                                            5)
-        check_counter_campare = HelperTests.get_locator_from_css_wb_wait(self.driver, ProductLocators.CAMPARE_COUNTER,
+        check_counter_compare = HelperTests.get_locator_from_css_wb_wait(self.driver, ProductLocators.COMPARE_COUNTER,
                                                                          5)
-        return check_available_campare, check_counter_campare
+        return check_available_compare, check_counter_compare
 
     def favorite_link_click(self):
         HelperTests.wait_click_css(self.driver, ProductLocators.ADD_TO_FAVORITE, 10)

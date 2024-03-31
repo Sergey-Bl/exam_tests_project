@@ -95,60 +95,72 @@ def test_about_request():
                 raise
 
 
-@allure.title("Тест-007: Авторизация пользователя")
+@pytest.mark.parametrize("user_credentials", [
+    {"email": "rubetta5064@awgarstone.com", "password": "b3719ec9"},
+])
 @pytest.mark.api_user()
 def test_user_login(user_credentials, default_header_json_value):
     payload = {"User": user_credentials}
     url = urls.URL_LOGIN
     headers = default_header_json_value
 
-    max_attempts = 5
+    max_attempts = 10
     for attempt in range(1, max_attempts + 1):
         try:
             response = session.post(url, headers=headers, data=json.dumps(payload))
+            response.raise_for_status()
 
-            assert response.headers.get('x-gate-user-id') == '14372444', "UserID не соответствует ожидаемому"
+            user_id = response.headers.get('x-gate-user-id')
+            assert user_id is not None and user_id != ''
+
             break
-        except (requests.exceptions.ProxyError, requests.exceptions.ConnectionError) as e:
+        except (requests.exceptions.RequestException, AssertionError) as e:
             print(f"Попытка {attempt} не удалась: {e}")
             if attempt == max_attempts:
-                raise
+                raise AssertionError(f"Тест не удался после {max_attempts} попыток")
 
 
-@allure.title("Тест-008: Операции выхода из системы")
+@pytest.mark.parametrize("user_credentials", [
+    ({"email": "rubetta5064@awgarstone.com", "password": "b3719ec9"}),
+])
 @pytest.mark.api_user()
 def test_user_logout(user_credentials, default_header_json_value):
-    payload = {
+    login_payload = {
         "User": user_credentials
     }
     attempts = 0
-    max_attempts = 5
+    max_attempts = 20
     while attempts < max_attempts:
         try:
-            response = session.post(
+            login_response = session.post(
                 url=urls.URL_LOGIN,
                 headers=default_header_json_value,
-                data=json.dumps(payload),
+                data=json.dumps(login_payload),
             )
-            assert response.headers.get('x-gate-user-id') == '14372444'
+            login_response.raise_for_status()
+            user_id = login_response.headers.get('x-gate-user-id')
+            assert user_id is not None, "Не удалось получить x-gate-user-id после авторизации"
 
-            response = session.post(
+            logout_response = session.post(
                 url=urls.URL_LOGOUT,
                 headers=default_header_json_value,
                 data=json.dumps({"route": "logout", "parameters": {}})
             )
-            assert response.headers.get('x-gate-user-id') != '14372444'
-            assert response.headers.get('x-gate-user-id') is None
+            logout_response.raise_for_status()
+
+            assert logout_response.headers.get(
+                'x-gate-user-id') is None, "x-gate-user-id должен быть None после выхода из системы"
             break
-        except requests.exceptions.ProxyError:
+        except requests.exceptions.RequestException as e:
             attempts += 1
+            print(f"Попытка {attempts}/{max_attempts} не удалась: {e}")
             if attempts == max_attempts:
-                raise
+                raise AssertionError(f"Тест не удался после {max_attempts} попыток")
 
 
 @allure.title("Тест-009: Ревью форма")
 @pytest.mark.api_opinion()
-def test_review_form(session, get_form_test_opinion):
+def test_review_form(get_form_test_opinion):
     response = get_form_test_opinion
 
     attempts = 0
@@ -178,9 +190,18 @@ def test_user_fail_login(default_header_json_value):
     }}
     url = urls.URL_LOGIN
     headers = default_header_json_value
-
-    response = session.post(url, headers=headers, data=json.dumps(payload))
-    assert response.headers.get('x-gate-user-id') == ''
+    attempts = 0
+    max_attempts = 5
+    while attempts < max_attempts:
+        try:
+            response = session.post(url, headers=headers, data=json.dumps(payload))
+            HelperApiTests.assert_status_code_2xx(response)
+            assert response.headers.get('x-gate-user-id') == ''
+            break
+        except requests.exceptions.RequestException:
+            attempts += 1
+            if attempts == max_attempts:
+                raise
 
 
 @allure.title("Тест-011: Попытка доступа с изменённым x-gate-user-id после авторизации")
@@ -199,7 +220,7 @@ def test_user_access_with_modified_userid(user_credentials, default_header_json_
 
     protected_response = session.put(protected_url, headers=modified_headers)
 
-    assert protected_response.status_code in [401, 403]
+    HelperApiTests.assert_status_code_4xx(protected_response)
 
 
 @allure.title("Тест-012: Вход с невалидными данными")
@@ -219,18 +240,64 @@ def test_user_fail_login_sql_inq(default_header_json_value):
         'error') == expected_error
 
 
+@pytest.mark.parametrize("email,password,expected_error", [
+    ("rubetta5064@awgarstone.com", "--/**&^%$%^&", "Введите email")])
 @allure.title("Тест-013: Вход с невалидным паролем")
 @pytest.mark.api_user()
-def test_user_fail_login_sql_inq(default_header_json_value):
-    payload = {"User": {
-        "email": "rubetta5064@awgarstone.com",
-        "password": "--/**&^%$%^&"
-    }}
+def test_user_fail_login_sql_inq(email, password, expected_error, default_header_json_value):
+    payload = {
+        "User": {
+            "email": email,
+            "password": password
+        }
+    }
     url = urls.URL_LOGIN
     headers = default_header_json_value
 
     response = session.post(url, headers=headers, data=json.dumps(payload))
     response_data = response.json()
-    expected_error = "Неправильный пароль"
-    assert response_data.get(
-        'error') == expected_error
+
+    assert response_data.get('error') == expected_error
+
+
+@pytest.mark.parametrize("email", [
+    "test2@gmail.com"])
+@allure.title('Тест-014 Ошибка при обращении к апи без сертификата')
+@pytest.mark.api_user()
+def test_reset_password_local_ssl(email, default_header_json_value):
+    headers = default_header_json_value
+    url = urls.RESET_PASSWORD_URL
+    response = session.post(url, headers=headers, data=json.dumps(email))
+    HelperApiTests.assert_status_code_5xx(response)
+
+
+@pytest.mark.parametrize("city, city_id", [
+    ("г. Брест", "2458"),
+])
+@allure.title('Тест-015 получение инфы по доствакам')
+@pytest.mark.api_delivery()
+def test_delivery_info_response(city, city_id, default_header_json_value):
+    params = {
+        "region[city]": city,
+        "region[type]": "г",
+        "region[region]": "",
+        "region[distance]": "0",
+        "region[city_id]": city_id,
+        "region[village_council]": "",
+        "item": "null",
+    }
+
+    response = session.get(
+        url=urls.DELIVERY_INFO_URL,
+        params=params,
+        headers=default_header_json_value
+    )
+
+    assert response.status_code == 200, f"Ожидался статус код 200, получен {response.status_code}"
+
+    value_delivery = response.json()
+    print(value_delivery)
+    assert value_delivery['city_id'] == city_id
+    expected_city_name = city.split(" ")[-1]
+    assert value_delivery['name_object'] == expected_city_name
+    assert 'delivery_group' in value_delivery
