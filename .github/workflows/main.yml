@@ -3,17 +3,17 @@ name: Python application test
 on:
   workflow_dispatch:
     inputs:
-      test-path:
-        description: 'Test path (e.g., tests/tests_ui/tests_21vek.py)'
+      test-type:
+        description: 'Type of tests to run (api or ui)'
         required: true
-        default: 'tests/'
+        default: 'ui'
       headless:
-        description: 'Run headless? (yes or no)'
-        required: true
+        description: 'Run headless? (yes or no) - applicable only for UI tests'
+        required: false
         default: 'yes'
       browser:
-        description: 'Browser (chrome or firefox)'
-        required: true
+        description: 'Browser (chrome or firefox) - applicable only for UI tests'
+        required: false
         default: 'chrome'
 
 jobs:
@@ -36,8 +36,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests
-        run: pytest ${{ github.event.inputs.test-path }} --headless=${{ github.event.inputs.headless }} --browser=${{ github.event.inputs.browser }}
+      - name: Run API tests
+        if: ${{ github.event.inputs.test-type == 'api' }}
+        run: pytest tests/tests_api/test_api.py
+
+      - name: Run UI tests
+        if: ${{ github.event.inputs.test-type == 'ui' }}
+        run: pytest tests/tests_ui/tests_21vek.py --headless=${{ github.event.inputs.headless }} --browser=${{ github.event.inputs.browser }}
 
       - name: Generate Allure report
         run: allure generate allure_logs -o allure-report
