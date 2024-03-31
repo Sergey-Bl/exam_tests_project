@@ -68,14 +68,24 @@ headless меняем на yes/no в зависимости от нужност�
 
 #### **После запуска тестов и когда они прошли можно сгенерировать репорт командой `allure serve allure_logs`**
 
+---
+
+<details>
+  <summary>Инструкция в картинках как запускать CI автоматизировано тесты на гите</summary>
+
+![Описание картинки Выбираем тесты и Run](https://files.fm/u/n3wd9rnkzx)
+
+![Описание картинки 2](url_картинки_2)
+
+</details>
+
 ----
 
-# **FAST tests run:**
+# **FAST tests run on your PC:**
 
 **API:** File for run API tests and collect allure report = **_run_api_tests.sh_** - `located /test_runners`
 
 **UI:** File for run UI tests and collect allure report = **_run_ui_tests.sh_** - `located /test_runners`
-
 
 ----
 ## **Notes:**
