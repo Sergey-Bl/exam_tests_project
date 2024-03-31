@@ -73,10 +73,10 @@ headless меняем на yes/no в зависимости от нужност�
 <details>
   <summary>Инструкция в картинках как запускать CI автоматизировано тесты на гите</summary>
 
-![Выбираем тесты и Run Wokflow]()![photo_2024-03-31_13-49-23](https://github.com/Sergey-Bl/exam_tests_project/assets/20835954/05ead9f9-b0f8-408c-923b-a66b66933be3)
+![Выбираем тесты и Run Wokflow]![photo_2024-03-31_13-49-23](https://github.com/Sergey-Bl/exam_tests_project/assets/20835954/05ead9f9-b0f8-408c-923b-a66b66933be3)
 
 
-![Выбираем какие тесты хотим запустить и запускаем кнопкой Run workflow]()![photo_2024-03-31_13-54-00](https://github.com/Sergey-Bl/exam_tests_project/assets/20835954/a1c9945f-acf4-4305-87e5-2cc68b6a2292)
+![Выбираем какие тесты хотим запустить и запускаем кнопкой Run workflow]![photo_2024-03-31_13-54-00](https://github.com/Sergey-Bl/exam_tests_project/assets/20835954/a1c9945f-acf4-4305-87e5-2cc68b6a2292)
 
 </details>
 
