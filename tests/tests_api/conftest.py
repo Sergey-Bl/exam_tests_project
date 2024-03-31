@@ -96,4 +96,3 @@ def pytest_sessionstart(session):
 
     if os.path.exists(log_file_path):
         open(log_file_path, 'w').close()
-        

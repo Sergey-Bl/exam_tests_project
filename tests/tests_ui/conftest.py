@@ -19,14 +19,16 @@ SCREENSHOTS_DIR = 'screenshots'
 
 
 def setup_logger():
-    global logger
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger('UI_Tests_Logger')
+    if not os.path.exists(LOG_DIR):
+        os.makedirs(LOG_DIR)
     log_file_path = os.path.join(LOG_DIR, LOG_FILE)
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
     file_handler = RotatingFileHandler(log_file_path, maxBytes=5 * 1024 * 1024, backupCount=2)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
+    return logger
 
 
 @pytest.fixture(autouse=True)
@@ -63,36 +65,41 @@ def create_driver(browser, headless):
 def pytest_runtest_makereport(item):
     outcome = yield
     report = outcome.get_result()
-    if 'driver' in item.fixturenames and (report.when == 'call' or report.when == 'setup'):
+
+    if report.when == 'call':
+        if report.passed:
+            logger.info(f"Тест успешно пройден: {item.nodeid}")
+        elif report.failed:
+            error_msg = report.longreprtext if report.longreprtext else "Ошибка не определена"
+            logger.error(f"Тест провален: {item.nodeid}, Причина: {error_msg}")
+        elif report.skipped:
+            reason = report.wasxfail if report.wasxfail else "Причина не указана"
+            logger.warning(f"Тест пропущен: {item.nodeid}, Причина: {reason}")
+
+    if 'driver' in item.fixturenames and report.when == 'call' and report.failed:
         driver = item.funcargs['driver']
-        if not os.path.exists(SCREENSHOTS_DIR):
-            os.makedirs(SCREENSHOTS_DIR)
-        timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        screenshot_name = f"{report.nodeid.replace('::', '_').replace('/', '_').replace(' ', '_')}_{timestamp}.png"
-        screenshot_path = os.path.join(SCREENSHOTS_DIR, screenshot_name)
-        driver.save_screenshot(screenshot_path)
-        logger.info(f"Скриншот сохранен: {screenshot_path}")
+        make_screenshot(driver, item.nodeid)
 
 
-@pytest.fixture(autouse=True)
-def test_logger(request):
-    logger.info(f"Начало теста: {request.node.nodeid}")
-    yield
-    if hasattr(request.node, "rep_call"):
-        if request.node.rep_call.passed:
-            logger.info(f"Тест успешно пройден: {request.node.nodeid}")
-        elif request.node.rep_call.failed:
-            logger.error(f"Тест провален: {request.node.nodeid}")
-        elif request.node.rep_call.skipped:
-            logger.warning(f"Тест пропущен: {request.node.nodeid}")
+def make_screenshot(driver, nodeid):
+    if not os.path.exists(SCREENSHOTS_DIR):
+        os.makedirs(SCREENSHOTS_DIR)
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    screenshot_name = f"{nodeid.replace('::', '_').replace('/', '_').replace(' ', '_')}_{timestamp}.png"
+    screenshot_path = os.path.join(SCREENSHOTS_DIR, screenshot_name)
+    driver.save_screenshot(screenshot_path)
+    logger.info(f"Скриншот сохранен: {screenshot_path}")
 
 
 def pytest_sessionstart(session):
-    for directory in [SCREENSHOTS_DIR, 'allure_logs']:
+    directories_to_clear = [LOG_DIR, SCREENSHOTS_DIR, 'allure_logs']
+    for directory in directories_to_clear:
         if os.path.exists(directory):
             shutil.rmtree(directory)
         os.makedirs(directory, exist_ok=True)
-    setup_logger()
+
+    global logger
+    logger = setup_logger()
 
 
 def pytest_addoption(parser):
