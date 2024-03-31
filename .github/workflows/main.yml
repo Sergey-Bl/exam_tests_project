@@ -1,11 +1,20 @@
 name: Python application test
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
+    inputs:
+      test-path:
+        description: 'Test path (e.g., tests/tests_ui/tests_21vek.py)'
+        required: true
+        default: 'tests/'
+      headless:
+        description: 'Run headless? (yes or no)'
+        required: true
+        default: 'yes'
+      browser:
+        description: 'Browser (chrome or firefox)'
+        required: true
+        default: 'chrome'
 
 jobs:
   build-and-test:
@@ -28,13 +37,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run tests
-        run: |
-          pytest tests/tests_api/test_api.py
-          pytest tests/tests_ui/tests_21vek.py --headless=yes browser=chrome
+        run: pytest ${{ github.event.inputs.test-path }} --headless=${{ github.event.inputs.headless }} --browser=${{ github.event.inputs.browser }}
 
       - name: Generate Allure report
-        run: |
-          allure generate allure_logs -o allure-report
+        run: allure generate allure_logs -o allure-report
         continue-on-error: true
 
       - uses: actions/upload-artifact@v2
