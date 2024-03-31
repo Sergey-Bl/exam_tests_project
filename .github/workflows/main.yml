@@ -29,7 +29,8 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/ --headless=yes --browser=chrome
+          pytest tests/tests_api/test_api.py
+          pytest tests/tests_ui/tests_21vek.py --headless=yes browser=chrome
 
       - name: Generate Allure report
         run: |
