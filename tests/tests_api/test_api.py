@@ -194,7 +194,7 @@ def test_user_access_with_modified_userid(user_credentials, default_header_json_
 
     login_response = session.post(login_url, headers=headers, data=json.dumps(payload))
     assert login_response.headers.get('x-gate-user-id') == '14372444', "UserID не соответствует ожидаемому"
-    modified_user_id = "12345678"
+    modified_user_id = "12345679"
     modified_headers = {**headers, 'x-gate-user-id': modified_user_id}
 
     protected_response = session.put(protected_url, headers=modified_headers)
