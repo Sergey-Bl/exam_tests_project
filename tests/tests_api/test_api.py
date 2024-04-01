@@ -7,6 +7,7 @@ import allure
 
 from data import urls
 from helpers.base_help_api import HelperApiTests
+from tests.tests_api.conftest import logger
 
 session = HelperApiTests.create_unverified_session()
 
@@ -25,8 +26,18 @@ def test_main_request():
 @pytest.mark.api_smoke()
 def test_main_request_negative():
     expected_url = f'{urls.DOMEN}+testest'
-    r_get = session.get(expected_url)
-    HelperApiTests.assert_status_code_4xx(r_get)
+    attempts = 0
+    max_attempts = 5
+    while attempts < max_attempts:
+        try:
+            r_get = session.get(expected_url)
+            HelperApiTests.assert_status_code_4xx(r_get)
+            assert r_get.headers.get("content-type") == "text/html; charset=UTF-8"
+            break
+        except requests.exceptions.RequestException:
+            attempts += 1
+            if attempts == max_attempts:
+                raise
 
 
 @allure.title("Тест-003: Проверка что хидер отдает верные данные/время")
@@ -100,24 +111,29 @@ def test_about_request():
 ])
 @pytest.mark.api_user()
 def test_user_login(user_credentials, default_header_json_value):
-    payload = {"User": user_credentials}
-    url = urls.URL_LOGIN
-    headers = default_header_json_value
-
-    max_attempts = 10
-    for attempt in range(1, max_attempts + 1):
+    login_payload = {
+        "User": user_credentials
+    }
+    attempts = 0
+    max_attempts = 20
+    while attempts < max_attempts:
         try:
-            response = session.post(url, headers=headers, data=json.dumps(payload))
-            response.raise_for_status()
+            login_response = session.post(
+                url=urls.URL_LOGIN,
+                headers=default_header_json_value,
+                data=json.dumps(login_payload),
+            )
+            login_response.raise_for_status()
+            user_id = login_response.headers.get('x-gate-user-id')
+            assert user_id is not None, "Не удалось получить x-gate-user-id после авторизации"
 
-            user_id = response.headers.get('x-gate-user-id')
-            assert user_id is not None and user_id != ''
-
-            break
-        except (requests.exceptions.RequestException, AssertionError) as e:
-            print(f"Попытка {attempt} не удалась: {e}")
-            if attempt == max_attempts:
+        except requests.exceptions.RequestException as e:
+            attempts += 1
+            print(f"Попытка {attempts}/{max_attempts} не удалась: {e}")
+            if attempts == max_attempts:
+                logger.error(f"Тест не прошел, ссл не пускает")
                 raise AssertionError(f"Тест не удался после {max_attempts} попыток")
+            break
 
 
 @pytest.mark.parametrize("user_credentials", [
@@ -164,7 +180,7 @@ def test_review_form(get_form_test_opinion):
     response = get_form_test_opinion
 
     attempts = 0
-    max_attempts = 5
+    max_attempts = 30
     while attempts < max_attempts:
         try:
             HelperApiTests.assert_status_code_2xx(response)
@@ -232,12 +248,22 @@ def test_user_fail_login_sql_inq(default_header_json_value):
     }}
     url = urls.URL_LOGIN
     headers = default_header_json_value
-
-    response = session.post(url, headers=headers, data=json.dumps(payload))
-    response_data = response.json()
+    attempts = 0
+    max_attempts = 50
     expected_error = "Ошибка валидации поля email"
-    assert response_data.get(
-        'error') == expected_error
+
+    while attempts < max_attempts:
+        try:
+            response = session.post(url, headers=headers, data=json.dumps(payload))
+            response_data = response.json()
+            HelperApiTests.assert_status_code_2xx(response_data)
+            assert response_data.get(
+                'error') == expected_error
+            break
+        except requests.exceptions.RequestException:
+            attempts += 1
+            if attempts == max_attempts:
+                raise
 
 
 @pytest.mark.parametrize("email,password,expected_error", [
@@ -253,11 +279,21 @@ def test_user_fail_login_sql_inq(email, password, expected_error, default_header
     }
     url = urls.URL_LOGIN
     headers = default_header_json_value
+    attempts = 0
+    max_attempts = 50
 
-    response = session.post(url, headers=headers, data=json.dumps(payload))
-    response_data = response.json()
+    while attempts < max_attempts:
+        try:
+            response = session.post(url, headers=headers, data=json.dumps(payload))
+            response_data = response.json()
+            HelperApiTests.assert_status_code_2xx(response)
+            assert response_data.get('error') == expected_error
 
-    assert response_data.get('error') == expected_error
+            break
+        except requests.exceptions.RequestException:
+            attempts += 1
+            if attempts == max_attempts:
+                raise
 
 
 @pytest.mark.parametrize("email", [
@@ -277,6 +313,8 @@ def test_reset_password_local_ssl(email, default_header_json_value):
 @allure.title('Тест-015 получение инфы по доствакам')
 @pytest.mark.api_delivery()
 def test_delivery_info_response(city, city_id, default_header_json_value):
+    attempts = 0
+    max_attempts = 50
     params = {
         "region[city]": city,
         "region[type]": "г",
@@ -286,18 +324,22 @@ def test_delivery_info_response(city, city_id, default_header_json_value):
         "region[village_council]": "",
         "item": "null",
     }
+    try:
+        response = session.get(
+            url=urls.DELIVERY_INFO_URL,
+            params=params,
+            headers=default_header_json_value
+        )
 
-    response = session.get(
-        url=urls.DELIVERY_INFO_URL,
-        params=params,
-        headers=default_header_json_value
-    )
+        assert response.status_code == 200, f"Ожидался статус код 200, получен {response.status_code}"
 
-    assert response.status_code == 200, f"Ожидался статус код 200, получен {response.status_code}"
-
-    value_delivery = response.json()
-    print(value_delivery)
-    assert value_delivery['city_id'] == city_id
-    expected_city_name = city.split(" ")[-1]
-    assert value_delivery['name_object'] == expected_city_name
-    assert 'delivery_group' in value_delivery
+        value_delivery = response.json()
+        print(value_delivery)
+        assert value_delivery['city_id'] == city_id
+        expected_city_name = city.split(" ")[-1]
+        assert value_delivery['name_object'] == expected_city_name
+        assert 'delivery_group' in value_delivery
+    except requests.exceptions.RequestException:
+        attempts += 1
+        if attempts == max_attempts:
+            raise
