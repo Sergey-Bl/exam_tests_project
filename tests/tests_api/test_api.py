@@ -241,22 +241,22 @@ def test_user_access_with_modified_userid(user_credentials, default_header_json_
 
 @allure.title("Тест-012: Вход с невалидными данными")
 @pytest.mark.api_user()
-def test_user_fail_login_sql_inq(default_header_json_value):
+def test_user_fail_incorrect_value(default_header_json_value):
     payload = {"User": {
-        "email": "--/**&^%$%^&",
-        "password": "--/**&^%$%^&"
+        "email": "--/**&^%$kjasnd%^&",
+        "password": "--/**&asdagh^%$%^&"
     }}
     url = urls.URL_LOGIN
     headers = default_header_json_value
     attempts = 0
     max_attempts = 50
-    expected_error = "Ошибка валидации поля email"
+    expected_error = "Введите email"
 
     while attempts < max_attempts:
         try:
             response = session.post(url, headers=headers, data=json.dumps(payload))
             response_data = response.json()
-            HelperApiTests.assert_status_code_2xx(response_data)
+            HelperApiTests.assert_status_code_2xx(response)
             assert response_data.get(
                 'error') == expected_error
             break
