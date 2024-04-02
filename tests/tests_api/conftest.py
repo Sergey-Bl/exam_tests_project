@@ -8,7 +8,7 @@ import requests
 
 import data
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 log_file_path = 'logger/test_results_api.log'

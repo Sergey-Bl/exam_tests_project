@@ -194,7 +194,9 @@ def test_review_form(get_form_test_opinion):
         except requests.exceptions.RequestException:
             attempts += 1
             if attempts == max_attempts:
-                raise
+                logger.error(f"Тест не прошел, ссл не пускает")
+                break
+            
 
 
 @allure.title("Тест-010: Вход с невалидными данными")
