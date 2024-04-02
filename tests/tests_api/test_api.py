@@ -175,14 +175,18 @@ def test_user_logout(user_credentials, default_header_json_value):
 
 
 @allure.title("Тест-009: Ревью форма")
-@pytest.mark.api_opinion()
-def test_review_form(get_form_test_opinion):
-    response = get_form_test_opinion
-
-    attempts = 0
+@pytest.mark.parametrize("url,params", [
+    (
+        urls.URL_OPINION_REST,
+        {"form": "Review", "item": "393764"}
+    )
+])
+def test_review_form(url, params):
     max_attempts = 30
-    while attempts < max_attempts:
+    for attempt in range(max_attempts):
         try:
+            response = session.get(url, params=params, verify=False)
+
             HelperApiTests.assert_status_code_2xx(response)
             assert 'id="form-add-review"' in response.text
             assert 'name="data[Review][reviewer_name]"' in response.text
@@ -191,12 +195,14 @@ def test_review_form(get_form_test_opinion):
             assert 'type="submit"' in response.text
             assert 'id="agreement"' in response.text
             break
-        except requests.exceptions.RequestException:
-            attempts += 1
-            if attempts == max_attempts:
-                logger.error(f"Тест не прошел, ссл не пускает")
-                break
-            
+        except AssertionError as e:
+            logger.error(str(e))
+            if attempt == max_attempts - 1:
+                pytest.fail(f"Тест не прошел после {max_attempts} попыток: {e}")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Ошибка запроса: {e}")
+            if attempt == max_attempts - 1:
+                pytest.fail(f"Тест не прошел из-за ошибки запроса после {max_attempts} попыток: {e}")
 
 
 @allure.title("Тест-010: Вход с невалидными данными")

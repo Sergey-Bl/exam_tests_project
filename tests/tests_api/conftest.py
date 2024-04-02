@@ -6,8 +6,6 @@ from logging.handlers import RotatingFileHandler
 import pytest
 import requests
 
-import data
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -20,17 +18,6 @@ file_handler = RotatingFileHandler(log_file_path, maxBytes=1024 * 1024 * 5, back
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
-
-
-@pytest.fixture(scope="module")
-def get_form_test_opinion(session, default_header_json_value):
-    url = data.urls.URL_OPINION_REST
-    params = {
-        "form": "Review",
-        "item": "393764",
-    }
-    response = session.get(url, params=params, headers=default_header_json_value, verify=False)
-    return response
 
 
 @pytest.fixture(scope="module")
@@ -90,7 +77,7 @@ def pytest_runtest_makereport(item):
         item.rep_call = rep
 
 
-def pytest_sessionstart(session):
+def pytest_sessionstart():
     allure_logs_dir = "allure_logs"
     if os.path.exists(allure_logs_dir):
         shutil.rmtree(allure_logs_dir)
