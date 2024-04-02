@@ -77,7 +77,7 @@ def pytest_runtest_makereport(item):
         item.rep_call = rep
 
 
-def pytest_sessionstart():
+def pytest_sessionstart(session):
     allure_logs_dir = "allure_logs"
     if os.path.exists(allure_logs_dir):
         shutil.rmtree(allure_logs_dir)
