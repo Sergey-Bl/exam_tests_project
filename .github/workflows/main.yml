@@ -48,6 +48,7 @@ jobs:
         run: pytest tests/tests_ui/tests_21vek.py --headless=${{ github.event.inputs.headless }} --browser=${{ github.event.inputs.browser }}
 
       - name: Generate Allure report
+        if: always()
         run: allure generate allure_logs -o allure-report
         continue-on-error: true
 
