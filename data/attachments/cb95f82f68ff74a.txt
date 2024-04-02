@@ -1,0 +1,2 @@
+INFO:conftest:Начало теста: tests/tests_api/test_api.py::test_review_form[https://www.21vek.by//get/form/-params0]
+INFO:conftest:Тест успешно пройден: tests/tests_api/test_api.py::test_review_form[https://www.21vek.by//get/form/-params0]

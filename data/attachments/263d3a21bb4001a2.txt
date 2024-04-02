@@ -1,0 +1,1 @@
+{'short_name': 'г.', 'name_object': 'Брест', 'city_unprefix': 'Брест', 'type': 'г.', 'city': 'г. Брест', 'id': '2194', 'city_id': '2458', 'distance': 8, 'region_alias': 'brest', 'region': 'Брестский р-н', 'delivery_group': 'Брестский р-н'}

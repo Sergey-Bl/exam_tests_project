@@ -1,0 +1,2 @@
+INFO     conftest:conftest.py:51 Начало теста: tests/tests_api/test_api.py::test_sp_request
+INFO     conftest:conftest.py:55 Тест успешно пройден: tests/tests_api/test_api.py::test_sp_request

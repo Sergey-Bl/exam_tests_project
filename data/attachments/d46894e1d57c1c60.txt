@@ -1,0 +1,2 @@
+INFO:conftest:Начало теста: tests/tests_api/test_api.py::test_user_logout[user_credentials0]
+INFO:conftest:Тест успешно пройден: tests/tests_api/test_api.py::test_user_logout[user_credentials0]
