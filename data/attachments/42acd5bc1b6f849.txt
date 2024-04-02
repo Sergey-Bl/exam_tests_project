@@ -1,0 +1,2 @@
+INFO:conftest:Начало теста: tests/tests_api/test_api.py::test_reset_password_local_ssl[test2@gmail.com]
+INFO:conftest:Тест успешно пройден: tests/tests_api/test_api.py::test_reset_password_local_ssl[test2@gmail.com]
