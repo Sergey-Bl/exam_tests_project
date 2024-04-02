@@ -1,2 +1,0 @@
-INFO:conftest:Начало теста: tests/tests_api/test_api.py::test_user_fail_login_sql_inq[rubetta5064@awgarstone.com---/**&^%$%^&-\u0412\u0432\u0435\u0434\u0438\u0442\u0435 email]
-INFO:conftest:Тест успешно пройден: tests/tests_api/test_api.py::test_user_fail_login_sql_inq[rubetta5064@awgarstone.com---/**&^%$%^&-\u0412\u0432\u0435\u0434\u0438\u0442\u0435 email]
