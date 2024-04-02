@@ -1,2 +1,0 @@
-INFO     conftest:conftest.py:64 Начало теста: tests/tests_api/test_api.py::test_user_fail_incorrect_value
-INFO     conftest:conftest.py:68 Тест успешно пройден: tests/tests_api/test_api.py::test_user_fail_incorrect_value

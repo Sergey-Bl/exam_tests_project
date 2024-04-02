@@ -1,2 +1,0 @@
-INFO     conftest:conftest.py:64 Начало теста: tests/tests_api/test_api.py::test_delivery_info_response[\u0433. \u0411\u0440\u0435\u0441\u0442-2458]
-INFO     conftest:conftest.py:68 Тест успешно пройден: tests/tests_api/test_api.py::test_delivery_info_response[\u0433. \u0411\u0440\u0435\u0441\u0442-2458]

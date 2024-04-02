@@ -1,2 +1,0 @@
-INFO:conftest:Начало теста: tests/tests_api/test_api.py::test_main_request_negative
-INFO:conftest:Тест успешно пройден: tests/tests_api/test_api.py::test_main_request_negative
