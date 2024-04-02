@@ -36,6 +36,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Install Allure Commandline
+        run: brew install allure
+
       - name: Run API tests
         if: ${{ github.event.inputs.test-type == 'api' }}
         run: pytest tests/tests_api/test_api.py
